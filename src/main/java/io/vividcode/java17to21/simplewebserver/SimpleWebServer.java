@@ -1,4 +1,4 @@
-package io.vividcode.java21.simplewebserver;
+package io.vividcode.java17to21.simplewebserver;
 
 import com.sun.net.httpserver.SimpleFileServer;
 import com.sun.net.httpserver.SimpleFileServer.OutputLevel;

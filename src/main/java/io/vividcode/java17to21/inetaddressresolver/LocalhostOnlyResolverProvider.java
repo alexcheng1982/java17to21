@@ -1,4 +1,4 @@
-package io.vividcode.java21.inetaddressresolver;
+package io.vividcode.java17to21.inetaddressresolver;
 
 import java.net.spi.InetAddressResolver;
 import java.net.spi.InetAddressResolverProvider;

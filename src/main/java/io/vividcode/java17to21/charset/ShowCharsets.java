@@ -1,4 +1,4 @@
-package io.vividcode.java21.charset;
+package io.vividcode.java17to21.charset;
 
 import java.nio.charset.Charset;
 import java.util.function.Supplier;

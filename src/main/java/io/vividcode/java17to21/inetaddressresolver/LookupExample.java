@@ -1,4 +1,4 @@
-package io.vividcode.java21.inetaddressresolver;
+package io.vividcode.java17to21.inetaddressresolver;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;

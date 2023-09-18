@@ -1,4 +1,4 @@
-package io.vividcode.java21.finalization;
+package io.vividcode.java17to21.finalization;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
