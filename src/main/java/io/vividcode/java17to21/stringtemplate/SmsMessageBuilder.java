@@ -1,4 +1,4 @@
-package io.vividcode.java17to21.stringtemplate.oldway;
+package io.vividcode.java17to21.stringtemplate;
 
 public interface SmsMessageBuilder {
 

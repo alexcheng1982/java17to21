@@ -1,5 +1,6 @@
 package io.vividcode.java17to21.stringtemplate.oldway;
 
+import io.vividcode.java17to21.stringtemplate.SmsMessageBuilder;
 import java.text.MessageFormat;
 
 public class MessageFormatImpl implements SmsMessageBuilder {
