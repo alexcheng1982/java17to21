@@ -12,10 +12,10 @@ public class UseJson {
     try {
       var node = JSON. """
           {
-            "name": "\{name}",
-            "email": "\{email}"
+            "name": "\{ name }",
+            "email": "\{ email }"
           }
-          """;
+          """ ;
       System.out.println(node.get("name"));
     } catch (JacksonException e) {
       e.printStackTrace();
