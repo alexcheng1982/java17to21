@@ -1,20 +1,17 @@
 package io.vividcode.java17to21.stringtemplate;
 
 import static java.lang.StringTemplate.RAW;
-import static java.lang.StringTemplate.STR;
-
-import java.util.List;
 
 public class SimpleStringTemplate {
 
   void fragmentsAndValues() {
     var name = "Alex";
-    StringTemplate st = RAW."My name is \{name}";
+    StringTemplate st = RAW. "My name is \{ name }" ;
     System.out.println(st.fragments());
     System.out.println(st.values());
     System.out.println(interpolate(st));
     System.out.println(st.interpolate());
-    System.out.println(STR."My name is \{name}");
+    System.out.println(STR. "My name is \{ name }" );
   }
 
   String interpolate(StringTemplate st) {
