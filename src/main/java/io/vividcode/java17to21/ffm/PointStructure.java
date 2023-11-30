@@ -1,49 +1,49 @@
-package io.vividcode.java11to17.ffm;
+package io.vividcode.java17to21.ffm;
 
+import static java.lang.foreign.ValueLayout.JAVA_INT;
+
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemoryLayout;
+import java.lang.foreign.MemoryLayout.PathElement;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SequenceLayout;
 import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
 import java.util.List;
-import jdk.incubator.foreign.MemoryLayout;
-import jdk.incubator.foreign.MemoryLayout.PathElement;
-import jdk.incubator.foreign.MemoryLayouts;
-import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.ResourceScope;
-import jdk.incubator.foreign.SequenceLayout;
 
 public class PointStructure {
 
   private final MemoryLayout pointLayout = MemoryLayout.structLayout(
-      MemoryLayouts.JAVA_INT.withName("x"),
-      MemoryLayouts.JAVA_INT.withName("y")
+      JAVA_INT.withName("x"),
+      JAVA_INT.withName("y")
   );
   private final SequenceLayout pointsLayout = MemoryLayout.sequenceLayout(
-      this.pointLayout);
-  private final VarHandle xHandle = this.pointsLayout.varHandle(int.class,
+      pointLayout);
+  private final VarHandle xHandle = pointsLayout.varHandle(
       PathElement.sequenceElement(),
       PathElement.groupElement("x"));
-  private final VarHandle yHandle = this.pointsLayout.varHandle(int.class,
+  private final VarHandle yHandle = pointsLayout.varHandle(
       PathElement.sequenceElement(),
       PathElement.groupElement("y"));
 
   public MemorySegment save(List<Point> points) {
-    MemorySegment segment = MemorySegment.allocateNative(
-        this.pointLayout.byteSize() * points.size(),
-        ResourceScope.newImplicitScope());
+    MemorySegment segment = Arena.ofAuto().allocate(
+        pointLayout.byteSize() * points.size());
     for (int i = 0; i < points.size(); i++) {
       Point point = points.get(i);
-      this.xHandle.set(segment, (long) i, point.x());
-      this.yHandle.set(segment, (long) i, point.y());
+      xHandle.set(segment, (long) i, point.x());
+      yHandle.set(segment, (long) i, point.y());
     }
     return segment;
   }
 
   public List<Point> load(MemorySegment segment) {
     int numberOfPoints = (int) (segment.byteSize()
-        / this.pointLayout.byteSize());
+        / pointLayout.byteSize());
     List<Point> points = new ArrayList<>(numberOfPoints);
     for (int i = 0; i < numberOfPoints; i++) {
-      int x = (int) this.xHandle.get(segment, (long) i);
-      int y = (int) this.yHandle.get(segment, (long) i);
+      int x = (int) xHandle.get(segment, (long) i);
+      int y = (int) yHandle.get(segment, (long) i);
       points.add(new Point(x, y));
     }
     return points;

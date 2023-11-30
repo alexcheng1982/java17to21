@@ -1,52 +1,48 @@
-package io.vividcode.java11to17.ffm;
+package io.vividcode.java17to21.ffm;
 
+import static java.lang.foreign.ValueLayout.ADDRESS;
+import static java.lang.foreign.ValueLayout.JAVA_INT;
+
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import jdk.incubator.foreign.CLinker;
-import jdk.incubator.foreign.FunctionDescriptor;
-import jdk.incubator.foreign.MemoryAccess;
-import jdk.incubator.foreign.MemoryAddress;
-import jdk.incubator.foreign.MemoryLayouts;
-import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.ResourceScope;
+
 
 public class CallQsort {
 
   public int[] qsort(int[] array)
       throws Throwable {
-    MethodHandle qsort = CLinker.getInstance().downcallHandle(
-        CLinker.systemLookup().lookup("qsort").get(),
-        MethodType.methodType(void.class, MemoryAddress.class, int.class,
-            int.class, MemoryAddress.class),
-        FunctionDescriptor.ofVoid(CLinker.C_POINTER, CLinker.C_INT,
-            CLinker.C_INT, CLinker.C_POINTER)
+    MethodHandle qsort = Linker.nativeLinker().downcallHandle(
+        Linker.nativeLinker().defaultLookup().find("qsort").get(),
+        FunctionDescriptor.ofVoid(ADDRESS, JAVA_INT,
+            JAVA_INT, ADDRESS)
     );
     MethodHandle compare = MethodHandles.lookup()
         .findStatic(CallQsort.class, "compare", MethodType.methodType(
-            int.class, MemoryAddress.class, MemoryAddress.class
+            int.class, MemorySegment.class, MemorySegment.class
         ));
-    MemoryAddress compareFuncPointer = CLinker.getInstance()
+    MemorySegment compareFuncPointer = Linker.nativeLinker()
         .upcallStub(compare,
             FunctionDescriptor.of(
-                CLinker.C_INT, CLinker.C_POINTER, CLinker.C_POINTER),
-            ResourceScope.newImplicitScope());
-    MemorySegment nativeArray = MemorySegment.allocateNative(
-        MemoryLayouts.JAVA_INT.byteSize() * array.length,
-        ResourceScope.newImplicitScope());
+                JAVA_INT, ADDRESS.withTargetLayout(JAVA_INT),
+                ADDRESS.withTargetLayout(JAVA_INT)),
+            Arena.ofAuto());
+    MemorySegment nativeArray = Arena.ofAuto().allocate(
+        JAVA_INT.byteSize() * array.length);
     nativeArray.copyFrom(MemorySegment.ofArray(array));
     qsort.invokeExact(
-        nativeArray.address(),
+        nativeArray,
         array.length,
-        (int) MemoryLayouts.JAVA_INT.byteSize(),
+        (int) JAVA_INT.byteSize(),
         compareFuncPointer);
-    return nativeArray.toIntArray();
+    return nativeArray.toArray(JAVA_INT);
   }
 
-  public static int compare(MemoryAddress address1, MemoryAddress address2) {
-    return MemoryAccess.getIntAtOffset(MemorySegment.globalNativeSegment(),
-        address1.toRawLongValue()) -
-        MemoryAccess.getIntAtOffset(MemorySegment.globalNativeSegment(),
-            address2.toRawLongValue());
+  public static int compare(MemorySegment address1, MemorySegment address2) {
+    return address1.get(JAVA_INT, 0) - address2.get(JAVA_INT, 0);
   }
 }

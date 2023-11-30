@@ -1,19 +1,23 @@
-package io.vividcode.java11to17.ffm;
+package io.vividcode.java17to21.ffm;
 
+import static java.lang.foreign.ValueLayout.JAVA_DOUBLE;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodType;
-import jdk.incubator.foreign.CLinker;
-import jdk.incubator.foreign.FunctionDescriptor;
 
 public class CallSqrt {
 
-  public double sqrt(double v) throws Throwable {
-    MethodHandle sqrt = CLinker.getInstance()
+  double sqrt(double v) throws Throwable {
+    MethodHandle sqrt = Linker.nativeLinker()
         .downcallHandle(
-            CLinker.systemLookup().lookup("sqrt").get(),
-            MethodType.methodType(double.class, double.class),
-            FunctionDescriptor.of(CLinker.C_DOUBLE, CLinker.C_DOUBLE)
+            Linker.nativeLinker().defaultLookup().find("sqrt").get(),
+            FunctionDescriptor.of(JAVA_DOUBLE, JAVA_DOUBLE)
         );
     return (double) sqrt.invokeExact(v);
+  }
+
+  public static void main(String[] args) throws Throwable {
+    System.out.println(new CallSqrt().sqrt(2.0));
   }
 }
