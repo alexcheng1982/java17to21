@@ -1,0 +1,26 @@
+@startuml
+
+
+interface MemoryLayout
+interface ValueLayout
+interface PaddingLayout
+interface SequenceLayout
+interface GroupLayout
+interface AddressLayout
+interface OfInt
+interface OfLong
+interface UnionLayout
+interface StructLayout
+
+MemoryLayout <|-- ValueLayout
+MemoryLayout <|-- PaddingLayout
+MemoryLayout <|-- SequenceLayout
+MemoryLayout <|-- GroupLayout
+
+GroupLayout <|-- UnionLayout
+GroupLayout <|-- StructLayout
+
+ValueLayout <|-- AddressLayout
+ValueLayout <|-- OfInt
+ValueLayout <|-- OfLong
+@enduml
