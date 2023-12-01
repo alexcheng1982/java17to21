@@ -14,18 +14,18 @@ import java.lang.invoke.MethodType;
 
 public class CallQsort {
 
-  public int[] qsort(int[] array)
-      throws Throwable {
-    MethodHandle qsort = Linker.nativeLinker().downcallHandle(
-        Linker.nativeLinker().defaultLookup().find("qsort").get(),
-        FunctionDescriptor.ofVoid(ADDRESS, JAVA_INT,
-            JAVA_INT, ADDRESS)
+  public int[] qsort(int[] array) throws Throwable {
+    Linker linker = Linker.nativeLinker();
+    MethodHandle qsort = linker.downcallHandle(
+        linker.defaultLookup().find("qsort").get(),
+        FunctionDescriptor.ofVoid(ADDRESS, JAVA_INT, JAVA_INT, ADDRESS)
     );
     MethodHandle compare = MethodHandles.lookup()
-        .findStatic(CallQsort.class, "compare", MethodType.methodType(
-            int.class, MemorySegment.class, MemorySegment.class
-        ));
-    MemorySegment compareFuncPointer = Linker.nativeLinker()
+        .findStatic(CallQsort.class, "compare",
+            MethodType.methodType(
+                int.class, MemorySegment.class, MemorySegment.class
+            ));
+    MemorySegment compareFuncPointer = linker
         .upcallStub(compare,
             FunctionDescriptor.of(
                 JAVA_INT, ADDRESS.withTargetLayout(JAVA_INT),
