@@ -9,20 +9,19 @@ import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 
-
+/**
+ * size_t strlen(const char *string)
+ */
 public class CallStrlen {
 
   long strlen(String input) throws Throwable {
-    MethodHandle strlen = Linker.nativeLinker()
+    Linker linker = Linker.nativeLinker();
+    MethodHandle strlen = linker
         .downcallHandle(
-            Linker.nativeLinker().defaultLookup().find("strlen").get(),
+            linker.defaultLookup().find("strlen").get(),
             FunctionDescriptor.of(JAVA_INT, ADDRESS)
         );
     MemorySegment segment = Arena.ofAuto().allocateUtf8String(input);
     return (int) strlen.invokeExact(segment);
-  }
-
-  public static void main(String[] args) throws Throwable {
-    System.out.println(new CallStrlen().strlen("Hello"));
   }
 }

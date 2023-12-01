@@ -6,18 +6,19 @@ import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.invoke.MethodHandle;
 
+/**
+ * double sqrt(double x)
+ */
 public class CallSqrt {
 
   double sqrt(double v) throws Throwable {
-    MethodHandle sqrt = Linker.nativeLinker()
+    Linker linker = Linker.nativeLinker();
+    MethodHandle sqrt = linker
         .downcallHandle(
-            Linker.nativeLinker().defaultLookup().find("sqrt").get(),
+            linker.defaultLookup().find("sqrt").get(),
             FunctionDescriptor.of(JAVA_DOUBLE, JAVA_DOUBLE)
         );
     return (double) sqrt.invokeExact(v);
   }
 
-  public static void main(String[] args) throws Throwable {
-    System.out.println(new CallSqrt().sqrt(2.0));
-  }
 }
