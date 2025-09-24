@@ -1,0 +1,41 @@
+package me.vividcode.java17to21.structuredconcurrency;
+
+import java.time.Duration;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.StructuredTaskScope;
+import java.util.concurrent.StructuredTaskScope.Subtask;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+public class InvokeAll {
+
+  public static void main(String[] args) throws Exception {
+    System.out.println(new InvokeAll().invokeAll());
+  }
+
+  public long invokeAll() throws InterruptedException, ExecutionException {
+    try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+      var subtasks = subTasks().map(scope::fork).toList();
+      scope.join();
+      scope.throwIfFailed();
+      return subtasks.stream().map(Subtask::get).reduce(0, Integer::sum);
+    }
+  }
+
+  private Stream<Callable<Integer>> subTasks() {
+    return IntStream.range(0, 10_000)
+        .mapToObj(
+            i ->
+                () -> {
+                  try {
+                    Thread.sleep(
+                        Duration.ofSeconds(ThreadLocalRandom.current().nextLong(3)));
+                  } catch (InterruptedException e) {
+                    // ignore
+                  }
+                  return i;
+                });
+  }
+}
